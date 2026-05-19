@@ -1,5 +1,7 @@
 package com.jdevs.securebankapi.auth.controller;
 
+import com.jdevs.securebankapi.auth.dto.LoginRequest;
+import com.jdevs.securebankapi.auth.dto.LoginResponse;
 import com.jdevs.securebankapi.auth.dto.RegisterRequest;
 import com.jdevs.securebankapi.auth.dto.RegisterResponse;
 import com.jdevs.securebankapi.auth.service.AuthService;
@@ -30,5 +32,16 @@ public class AuthController {
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(ApiResponse.success("User registered successfully", response));
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<ApiResponse<LoginResponse>> login(
+            @Valid @RequestBody LoginRequest request
+    ) {
+        LoginResponse response = authService.login(request);
+
+        return ResponseEntity.ok(
+                ApiResponse.success("Login successful", response)
+        );
     }
 }
