@@ -4,6 +4,7 @@ import com.jdevs.securebankapi.auth.dto.LoginRequest;
 import com.jdevs.securebankapi.auth.dto.LoginResponse;
 import com.jdevs.securebankapi.auth.dto.RegisterRequest;
 import com.jdevs.securebankapi.auth.dto.RegisterResponse;
+import com.jdevs.securebankapi.auth.token.JwtService;
 import com.jdevs.securebankapi.user.entity.AppUser;
 import com.jdevs.securebankapi.user.entity.Role;
 import com.jdevs.securebankapi.user.repository.AppUserRepository;
@@ -21,15 +22,17 @@ public class AuthService {
     private final AppUserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
+    private final JwtService jwtService;
 
     public AuthService(
             AppUserRepository userRepository,
             PasswordEncoder passwordEncoder,
-            AuthenticationManager authenticationManager
+            AuthenticationManager authenticationManager, JwtService jwtService
     ) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.authenticationManager = authenticationManager;
+        this.jwtService = jwtService;
     }
 
     @Transactional
@@ -74,10 +77,12 @@ public class AuthService {
 
         AppUserDetails userDetails = (AppUserDetails) authentication.getPrincipal();
 
+        String accessToken = jwtService.generateAccessToken(userDetails);
+
         return new LoginResponse(
-                "token-will-come-in-next-step",
+                accessToken,
                 "Bearer",
-                900L
+                jwtService.getAccessTokenExpirationSeconds()
         );
     }
 }
